@@ -1,6 +1,6 @@
 import React from "react";
 import MainHeader from "../../components/MainHeader";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const user = {
   nome: "Sofia Almeida",
@@ -158,6 +158,7 @@ const configCards = [
 ];
 
 const PerfilConfiguracao: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#f6f9fb] font-sans">
       <MainHeader avatarUrl={user.avatar} />
@@ -190,6 +191,15 @@ const PerfilConfiguracao: React.FC = () => {
               <path d="M12 4v16M4 12h16" stroke="#5B7F95" strokeWidth="2" />
             </svg>
             Ajuda e feedback
+          </button>
+          <button
+            className="mt-2 flex items-center gap-2 px-4 py-2 rounded-lg text-[#B85C2B] hover:bg-[#fbe9e6] text-base font-medium transition"
+            onClick={() => navigate("/")}
+          >
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+              <path d="M6 18L18 6M6 6l12 12" stroke="#B85C2B" strokeWidth="2" />
+            </svg>
+            Logout
           </button>
         </aside>
         {/* Conteúdo principal moderno */}
