@@ -1,31 +1,21 @@
 import React, { useState } from "react";
 import MainHeader from "../../components/MainHeader";
+import { unidades, locaisUnidades, ocorrencias } from "../../data/data";
+
+const gravidades = ["Leve", "Moderado", "Grave"];
 
 const NovaOcorrencia: React.FC = () => {
-  const [unidade, setUnidade] = useState("Unidade A");
-  const [setor, setSetor] = useState("Produção");
+  const [unidade, setUnidade] = useState(unidades[0]);
+  const [setor, setSetor] = useState(locaisUnidades[0]);
   const [data, setData] = useState("2024-04-23");
   const [hora, setHora] = useState("15:30");
-  const [categoria, setCategoria] = useState<string[]>(["Segurança"]);
+  const [categoria, setCategoria] = useState(ocorrencias[0]);
+  const [gravidade, setGravidade] = useState(gravidades[0]);
+  const [selectedTipo, setSelectedTipo] = useState<"AVU" | "BRO" | "">("");
   const [descricao, setDescricao] = useState("");
   const [acoes, setAcoes] = useState("");
   const [recomendacoes, setRecomendacoes] = useState("");
   const [anexos, setAnexos] = useState<File[]>([]);
-
-  const categorias = [
-    "Segurança",
-    "Meio Ambiente",
-    "Qualidade",
-    "Processo",
-    "Manutenção",
-    "Outros",
-  ];
-
-  function handleCategoria(cat: string) {
-    setCategoria((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
-  }
 
   function handleAnexos(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files) {
@@ -50,9 +40,11 @@ const NovaOcorrencia: React.FC = () => {
               onChange={(e) => setUnidade(e.target.value)}
               className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
             >
-              <option>Unidade A</option>
-              <option>Unidade B</option>
-              <option>Unidade C</option>
+              {unidades.map((u) => (
+                <option key={u} value={u}>
+                  {u}
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -64,10 +56,46 @@ const NovaOcorrencia: React.FC = () => {
               onChange={(e) => setSetor(e.target.value)}
               className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
             >
-              <option>Produção</option>
-              <option>Embalagem</option>
-              <option>Expedição</option>
+              {locaisUnidades.map((l) => (
+                <option key={l} value={l}>
+                  {l}
+                </option>
+              ))}
             </select>
+          </div>
+          {/* AVU e BRO botões estilizados lado a lado, compactos e elegantes */}
+          <div>
+            <label className="block font-semibold mb-1 text-[#222]">Tipo</label>
+            <div className="flex gap-3 justify-start mt-1 mb-2">
+              <button
+                type="button"
+                className={`px-6 h-9 rounded-full border text-base font-medium transition-all duration-150 shadow-sm focus:outline-none
+                  ${
+                    selectedTipo === "AVU"
+                      ? "bg-[#2196C9] text-white border-[#2196C9] ring-2 ring-[#2196C9]/30"
+                      : "bg-white text-[#222] border-[#e3e8ee] hover:bg-[#e8f0fa]"
+                  }
+                `}
+                onClick={() => setSelectedTipo("AVU")}
+                aria-pressed={selectedTipo === "AVU"}
+              >
+                AVU
+              </button>
+              <button
+                type="button"
+                className={`px-6 h-9 rounded-full border text-base font-medium transition-all duration-150 shadow-sm focus:outline-none
+                  ${
+                    selectedTipo === "BRO"
+                      ? "bg-[#2196C9] text-white border-[#2196C9] ring-2 ring-[#2196C9]/30"
+                      : "bg-white text-[#222] border-[#e3e8ee] hover:bg-[#e8f0fa]"
+                  }
+                `}
+                onClick={() => setSelectedTipo("BRO")}
+                aria-pressed={selectedTipo === "BRO"}
+              >
+                BRO
+              </button>
+            </div>
           </div>
           <div>
             <label className="block font-semibold mb-1 text-[#222]">
@@ -90,24 +118,36 @@ const NovaOcorrencia: React.FC = () => {
           </div>
           <div>
             <label className="block font-semibold mb-1 text-[#222]">
-              Categoria
+              Categoria da Ocorrência
             </label>
-            <div className="flex flex-wrap gap-2">
-              {categorias.map((cat) => (
-                <button
-                  type="button"
-                  key={cat}
-                  className={`px-4 py-2 rounded-lg border ${
-                    categoria.includes(cat)
-                      ? "bg-[#e3e8ee] border-[#2196C9] text-[#222]"
-                      : "bg-white border-[#e3e8ee] text-[#222]"
-                  }`}
-                  onClick={() => handleCategoria(cat)}
-                >
-                  {cat}
-                </button>
+            <select
+              value={categoria}
+              onChange={(e) => setCategoria(e.target.value)}
+              className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
+            >
+              {ocorrencias.map((o) => (
+                <option key={o} value={o}>
+                  {o}
+                </option>
               ))}
-            </div>
+            </select>
+          </div>
+          {/* Gravidade */}
+          <div>
+            <label className="block font-semibold mb-1 text-[#222]">
+              Gravidade
+            </label>
+            <select
+              value={gravidade}
+              onChange={(e) => setGravidade(e.target.value)}
+              className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
+            >
+              {gravidades.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block font-semibold mb-1 text-[#222]">
