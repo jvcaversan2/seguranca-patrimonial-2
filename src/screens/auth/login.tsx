@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Group47 from "../../assets/Group 47.svg";
 import AuthHeader from "../../components/AuthHeader";
 import InputWithIcon from "../../components/InputWithIcon";
@@ -8,10 +9,11 @@ import AuthFooter from "../../components/AuthFooter";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Email: ${email}\nSenha: ${password}`);
+    navigate("/home");
   };
 
   return (
