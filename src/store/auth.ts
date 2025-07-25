@@ -18,13 +18,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
 
   login: (token: string) => {
-    localStorage.setItem("access_token", token);
+    localStorage.setItem("token", token);
     const payload = decodeJwt(token);
     set({ token: token, user: payload });
   },
 
   logout: () => {
-    localStorage.removeItem("access_token");
+    localStorage.removeItem("token");
     set({ token: null, user: null });
   },
 }));
