@@ -1,6 +1,7 @@
 import React from "react";
 import MainHeader from "../../components/MainHeader";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/auth";
 
 const user = {
   nome: "Sofia Almeida",
@@ -159,11 +160,18 @@ const configCards = [
 
 const PerfilConfiguracao: React.FC = () => {
   const navigate = useNavigate();
+
+  const onClickLogout = () => {
+    const logout = useAuthStore.getState().logout;
+
+    logout();
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen bg-[#f6f9fb] font-sans">
       <MainHeader avatarUrl={user.avatar} />
       <div className="flex max-w-[1400px] mx-auto pt-6">
-        {/* Sidebar */}
         <aside className="hidden md:flex flex-col w-64 min-w-[220px] bg-transparent pr-8 border-r border-[#e3e8ee]">
           <nav className="flex flex-col gap-1 mt-2">
             {sidebarItems.map((item) => (
@@ -193,8 +201,8 @@ const PerfilConfiguracao: React.FC = () => {
             Ajuda e feedback
           </button>
           <button
+            onClick={onClickLogout}
             className="mt-2 flex items-center gap-2 px-4 py-2 rounded-lg text-[#B85C2B] hover:bg-[#fbe9e6] text-base font-medium transition"
-            onClick={() => navigate("/")}
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
               <path d="M6 18L18 6M6 6l12 12" stroke="#B85C2B" strokeWidth="2" />
@@ -202,7 +210,6 @@ const PerfilConfiguracao: React.FC = () => {
             Logout
           </button>
         </aside>
-        {/* Conteúdo principal moderno */}
         <main className="flex-1 flex flex-col items-center px-2 sm:px-8">
           <div className="w-full max-w-2xl flex flex-col items-center mt-2 mb-10">
             <img

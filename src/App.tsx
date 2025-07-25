@@ -8,6 +8,7 @@ import NovaOcorrencia from "./screens/novaocorrencia/novaocorrencia";
 import DetalhesOcorrencias from "./screens/detalhesocorrencias/detalhesocorrencias";
 import PerfilConfiguracao from "./screens/perfilconfiguracao/perfilconfiguracao";
 import Relatorios from "./screens/relatorios/relatorios";
+import { PrivateRoute } from "./store/privateRoutes";
 
 function App() {
   return (
@@ -15,12 +16,55 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/ocorrencias" element={<Ocorrencias />} />
-        <Route path="/novaocorrencia" element={<NovaOcorrencia />} />
-        <Route path="/detalhesocorrencias" element={<DetalhesOcorrencias />} />
-        <Route path="/perfilconfiguracao" element={<PerfilConfiguracao />} />
-        <Route path="/relatorios" element={<Relatorios />} />
+
+        <Route
+          path="/home"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/ocorrencias"
+          element={
+            <PrivateRoute>
+              <Ocorrencias />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/novaocorrencia"
+          element={
+            <PrivateRoute>
+              <NovaOcorrencia />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/detalhesocorrencias/:id"
+          element={
+            <PrivateRoute>
+              <DetalhesOcorrencias />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/perfilconfiguracao"
+          element={
+            <PrivateRoute>
+              <PerfilConfiguracao />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/relatorios"
+          element={
+            <PrivateRoute>
+              <Relatorios />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

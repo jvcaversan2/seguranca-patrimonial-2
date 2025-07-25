@@ -5,15 +5,29 @@ import AuthHeader from "../../components/AuthHeader";
 import InputWithIcon from "../../components/InputWithIcon";
 import PrimaryButton from "../../components/PrimaryButton";
 import AuthFooter from "../../components/AuthFooter";
+import { useLogin } from "../../hooks/useLogin";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const { mutateAsync: login, isPending } = useLogin(() => {
     navigate("/home");
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await login({ email, password });
+      console.log("LOGIN SUCCESS", response); // Veja se isso aparece
+    } catch (err: any) {
+      console.error(
+        "Erro no login:",
+        err.response?.data?.message || err.message
+      );
+    }
   };
 
   return (
@@ -86,7 +100,9 @@ export default function Login() {
               </svg>
             </InputWithIcon>
           </div>
-          <PrimaryButton type="submit">Entrar</PrimaryButton>
+          <PrimaryButton type="submit" disabled={isPending}>
+            {isPending ? "Entrando..." : "Entrar"}
+          </PrimaryButton>
         </form>
         <AuthFooter
           text="Não tem uma conta?"

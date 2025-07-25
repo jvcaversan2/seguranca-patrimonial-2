@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import MainHeader from "../../components/MainHeader";
 import { unidades, locaisUnidades, ocorrencias } from "../../data/data";
+import { useCreateOccurrence } from "../../hooks/useCreateOccurrence";
 
 const gravidades = ["Leve", "Moderado", "Grave"];
+const classificacoes = ["Positiva", "Negativa"];
+const statusList = ["Aberto", "Fechado", "Em andamento"];
+const moedas = ["BRL", "USD", "EUR"];
 
 const NovaOcorrencia: React.FC = () => {
   const [unidade, setUnidade] = useState(unidades[0]);
@@ -11,17 +15,47 @@ const NovaOcorrencia: React.FC = () => {
   const [hora, setHora] = useState("15:30");
   const [categoria, setCategoria] = useState(ocorrencias[0]);
   const [gravidade, setGravidade] = useState(gravidades[0]);
+  const [classificacao, setClassificacao] = useState(classificacoes[0]);
   const [selectedTipo, setSelectedTipo] = useState<"AVU" | "BRO" | "">("");
   const [descricao, setDescricao] = useState("");
-  const [acoes, setAcoes] = useState("");
-  const [recomendacoes, setRecomendacoes] = useState("");
-  const [anexos, setAnexos] = useState<File[]>([]);
+  const [cidade, setCidade] = useState("");
+  const [status, setStatus] = useState(statusList[0]);
+  const [moeda, setMoeda] = useState(moedas[0]);
+  const [custoEvento, setCustoEvento] = useState("");
+  const [custoTotal, setCustoTotal] = useState("");
 
-  function handleAnexos(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.files) {
-      setAnexos(Array.from(e.target.files));
+  const { mutateAsync: createOccurrence, isPending } = useCreateOccurrence(
+    () => {
+      alert("Ocorrência registrada com sucesso!");
     }
-  }
+  );
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const gravidadeCorrigida =
+      gravidade === "Moderado" ? "Moderada" : gravidade;
+    const isoDateTime = new Date(`${data}T${hora}:00`).toISOString();
+
+    try {
+      await createOccurrence({
+        date: data,
+        time: isoDateTime,
+        attendedArea: setor,
+        location: unidade,
+        report: descricao,
+        classification: classificacao as "Positiva" | "Negativa",
+        severity: gravidadeCorrigida as "Leve" | "Moderada" | "Grave",
+        type: selectedTipo || undefined,
+        city: cidade || undefined,
+        status: status || undefined,
+        currency: moeda || undefined,
+        eventCost: custoEvento ? parseFloat(custoEvento) : undefined,
+        totalCost: custoTotal ? parseFloat(custoTotal) : undefined,
+      });
+    } catch (err) {
+      console.error("Erro ao registrar ocorrência:", err);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f6f9fb] font-sans">
@@ -30,7 +64,7 @@ const NovaOcorrencia: React.FC = () => {
         <h1 className="text-4xl font-bold text-[#222] mb-8">
           Registro de Ocorrência
         </h1>
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label className="block font-semibold mb-1 text-[#222]">
               Unidade Fabril
@@ -38,7 +72,7 @@ const NovaOcorrencia: React.FC = () => {
             <select
               value={unidade}
               onChange={(e) => setUnidade(e.target.value)}
-              className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
+              className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3"
             >
               {unidades.map((u) => (
                 <option key={u} value={u}>
@@ -47,6 +81,7 @@ const NovaOcorrencia: React.FC = () => {
               ))}
             </select>
           </div>
+
           <div>
             <label className="block font-semibold mb-1 text-[#222]">
               Setor / Local da Ocorrência
@@ -54,7 +89,7 @@ const NovaOcorrencia: React.FC = () => {
             <select
               value={setor}
               onChange={(e) => setSetor(e.target.value)}
-              className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
+              className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3"
             >
               {locaisUnidades.map((l) => (
                 <option key={l} value={l}>
@@ -63,40 +98,27 @@ const NovaOcorrencia: React.FC = () => {
               ))}
             </select>
           </div>
-          {/* AVU e BRO botões estilizados lado a lado, compactos e elegantes */}
+
           <div>
             <label className="block font-semibold mb-1 text-[#222]">Tipo</label>
-            <div className="flex gap-3 justify-start mt-1 mb-2">
-              <button
-                type="button"
-                className={`px-6 h-9 rounded-full border text-base font-medium transition-all duration-150 shadow-sm focus:outline-none
-                  ${
-                    selectedTipo === "AVU"
+            <div className="flex gap-3 mt-1 mb-2">
+              {["AVU", "BRO"].map((tipo) => (
+                <button
+                  key={tipo}
+                  type="button"
+                  className={`px-6 h-9 rounded-full border text-base font-medium transition-all shadow-sm ${
+                    selectedTipo === tipo
                       ? "bg-[#2196C9] text-white border-[#2196C9] ring-2 ring-[#2196C9]/30"
                       : "bg-white text-[#222] border-[#e3e8ee] hover:bg-[#e8f0fa]"
-                  }
-                `}
-                onClick={() => setSelectedTipo("AVU")}
-                aria-pressed={selectedTipo === "AVU"}
-              >
-                AVU
-              </button>
-              <button
-                type="button"
-                className={`px-6 h-9 rounded-full border text-base font-medium transition-all duration-150 shadow-sm focus:outline-none
-                  ${
-                    selectedTipo === "BRO"
-                      ? "bg-[#2196C9] text-white border-[#2196C9] ring-2 ring-[#2196C9]/30"
-                      : "bg-white text-[#222] border-[#e3e8ee] hover:bg-[#e8f0fa]"
-                  }
-                `}
-                onClick={() => setSelectedTipo("BRO")}
-                aria-pressed={selectedTipo === "BRO"}
-              >
-                BRO
-              </button>
+                  }`}
+                  onClick={() => setSelectedTipo(tipo as "AVU" | "BRO")}
+                >
+                  {tipo}
+                </button>
+              ))}
             </div>
           </div>
+
           <div>
             <label className="block font-semibold mb-1 text-[#222]">
               Data e Hora da Ocorrência
@@ -106,16 +128,30 @@ const NovaOcorrencia: React.FC = () => {
                 type="date"
                 value={data}
                 onChange={(e) => setData(e.target.value)}
-                className="w-1/2 rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
+                className="w-1/2 rounded-lg border border-[#e3e8ee] px-4 py-3 bg-white"
               />
               <input
                 type="time"
                 value={hora}
                 onChange={(e) => setHora(e.target.value)}
-                className="w-1/2 rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
+                className="w-1/2 rounded-lg border border-[#e3e8ee] px-4 py-3 bg-white"
               />
             </div>
           </div>
+
+          <div>
+            <label className="block font-semibold mb-1 text-[#222]">
+              Cidade
+            </label>
+            <input
+              type="text"
+              value={cidade}
+              onChange={(e) => setCidade(e.target.value)}
+              className="w-full rounded-lg border border-[#e3e8ee] px-4 py-3 bg-white"
+              placeholder="Digite a cidade"
+            />
+          </div>
+
           <div>
             <label className="block font-semibold mb-1 text-[#222]">
               Categoria da Ocorrência
@@ -123,7 +159,7 @@ const NovaOcorrencia: React.FC = () => {
             <select
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
-              className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
+              className="w-full rounded-lg border border-[#e3e8ee] px-4 py-3 bg-white"
             >
               {ocorrencias.map((o) => (
                 <option key={o} value={o}>
@@ -132,7 +168,24 @@ const NovaOcorrencia: React.FC = () => {
               ))}
             </select>
           </div>
-          {/* Gravidade */}
+
+          <div>
+            <label className="block font-semibold mb-1 text-[#222]">
+              Classificação
+            </label>
+            <select
+              value={classificacao}
+              onChange={(e) => setClassificacao(e.target.value)}
+              className="w-full rounded-lg border border-[#e3e8ee] px-4 py-3 bg-white"
+            >
+              {classificacoes.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label className="block font-semibold mb-1 text-[#222]">
               Gravidade
@@ -140,7 +193,7 @@ const NovaOcorrencia: React.FC = () => {
             <select
               value={gravidade}
               onChange={(e) => setGravidade(e.target.value)}
-              className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
+              className="w-full rounded-lg border border-[#e3e8ee] px-4 py-3 bg-white"
             >
               {gravidades.map((g) => (
                 <option key={g} value={g}>
@@ -149,6 +202,7 @@ const NovaOcorrencia: React.FC = () => {
               ))}
             </select>
           </div>
+
           <div>
             <label className="block font-semibold mb-1 text-[#222]">
               Descrição da Ocorrência
@@ -156,96 +210,79 @@ const NovaOcorrencia: React.FC = () => {
             <textarea
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
-              className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
-              rows={2}
+              className="w-full rounded-lg border border-[#e3e8ee] px-4 py-3 bg-white"
+              rows={3}
               placeholder="Descreva detalhadamente o que aconteceu"
             />
           </div>
+
           <div>
             <label className="block font-semibold mb-1 text-[#222]">
-              Ações Imediatas
+              Status
             </label>
-            <textarea
-              value={acoes}
-              onChange={(e) => setAcoes(e.target.value)}
-              className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
-              rows={2}
-              placeholder="Quais ações foram tomadas imediatamente após a ocorrência?"
-            />
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full rounded-lg border border-[#e3e8ee] px-4 py-3 bg-white"
+            >
+              {statusList.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
           </div>
+
           <div>
             <label className="block font-semibold mb-1 text-[#222]">
-              Recomendações
+              Moeda de Custo
             </label>
-            <textarea
-              value={recomendacoes}
-              onChange={(e) => setRecomendacoes(e.target.value)}
-              className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3 text-base"
-              rows={2}
-              placeholder="Quais recomendações para evitar futuras ocorrências?"
-            />
+            <select
+              value={moeda}
+              onChange={(e) => setMoeda(e.target.value)}
+              className="w-full rounded-lg border border-[#e3e8ee] px-4 py-3 bg-white"
+            >
+              {moedas.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
           </div>
-          <div>
-            <label className="block font-semibold mb-1 text-[#222]">
-              Evidências / Anexos
-            </label>
-            <div className="w-full rounded-xl border border-[#e3e8ee] bg-white p-6 flex flex-col gap-3">
-              <span className="font-semibold text-[#222] mb-2">
-                Arraste e solte arquivos ou{" "}
-                <span className="underline cursor-pointer">
-                  Selecionar arquivos
-                </span>
-              </span>
+
+          <div className="flex gap-4">
+            <div className="w-1/2">
+              <label className="block font-semibold mb-1 text-[#222]">
+                Custo do Evento
+              </label>
               <input
-                type="file"
-                multiple
-                className="hidden"
-                id="anexos"
-                onChange={handleAnexos}
+                type="number"
+                value={custoEvento}
+                onChange={(e) => setCustoEvento(e.target.value)}
+                className="w-full rounded-lg border border-[#e3e8ee] px-4 py-3 bg-white"
+                placeholder="Ex: 1000"
               />
-              <div className="flex flex-col gap-2">
-                {anexos.map((file, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2 bg-[#f6f9fb] rounded-lg px-3 py-2 w-fit"
-                  >
-                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                      <rect
-                        x="3"
-                        y="7"
-                        width="18"
-                        height="14"
-                        rx="2"
-                        stroke="#2196C9"
-                        strokeWidth="2"
-                      />
-                      <path d="M3 7l9 6 9-6" stroke="#2196C9" strokeWidth="2" />
-                    </svg>
-                    <span className="text-[#222] text-base">{file.name}</span>
-                  </div>
-                ))}
-              </div>
+            </div>
+            <div className="w-1/2">
+              <label className="block font-semibold mb-1 text-[#222]">
+                Custo Total
+              </label>
+              <input
+                type="number"
+                value={custoTotal}
+                onChange={(e) => setCustoTotal(e.target.value)}
+                className="w-full rounded-lg border border-[#e3e8ee] px-4 py-3 bg-white"
+                placeholder="Ex: 1500"
+              />
             </div>
           </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <label className="block font-semibold mb-1 text-[#222]">
-                Responsável pelo Registro
-              </label>
-              <span className="block text-[#222]">João da Silva</span>
-            </div>
-            <div>
-              <label className="block font-semibold mb-1 text-[#222]">
-                Data de Registro
-              </label>
-              <span className="block text-[#222]">24/04/2024</span>
-            </div>
-          </div>
+
           <button
             type="submit"
-            className="w-full py-3 bg-[#2196C9] hover:bg-[#176b8a] text-white font-bold rounded-lg transition text-lg shadow-md mt-2"
+            disabled={isPending}
+            className="w-full py-3 bg-[#2196C9] hover:bg-[#176b8a] text-white font-bold rounded-lg text-lg mt-4 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Registrar Ocorrência
+            {isPending ? "Registrando..." : "Registrar Ocorrência"}
           </button>
         </form>
       </main>
