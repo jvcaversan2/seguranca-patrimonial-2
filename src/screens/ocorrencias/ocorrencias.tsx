@@ -26,8 +26,6 @@ const Ocorrencias: React.FC = () => {
             + Nova Ocorrência
           </button>
         </div>
-
-        {/* Busca (não implementada ainda) */}
         <div className="mb-6">
           <div className="relative w-full">
             <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[#fff] opacity-60">
@@ -51,7 +49,6 @@ const Ocorrencias: React.FC = () => {
           </div>
         </div>
 
-        {/* Filtros visuais */}
         <div className="flex gap-4 mb-6">
           {["Status", "Data"].map((f) => (
             <button
@@ -66,7 +63,6 @@ const Ocorrencias: React.FC = () => {
           ))}
         </div>
 
-        {/* Tabela */}
         <div className="bg-white rounded-2xl shadow p-4 overflow-x-auto">
           <table className="min-w-full text-left">
             <thead>

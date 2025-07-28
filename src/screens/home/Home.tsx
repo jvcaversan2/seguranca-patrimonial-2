@@ -1,12 +1,18 @@
 import React, { useState, useRef, useLayoutEffect } from "react";
 import MainHeader from "../../components/MainHeader";
 import GptMapImage from "../../assets/ChatGPT Image 21_07_2025, 13_40_14.png";
+import { useRecentOccurrences } from "../../hooks/useRecentsOccurrences";
+import { statusColorMap, statusMap } from "../../utils/statusUtils";
 
 const Home: React.FC = () => {
   const [zoom, setZoom] = useState(1);
   const [minZoom, setMinZoom] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+
+  const { data: recentOccurrences = [], isLoading } = useRecentOccurrences();
+
+  console.log(recentOccurrences);
 
   useLayoutEffect(() => {
     function updateMinZoom() {
@@ -37,7 +43,6 @@ const Home: React.FC = () => {
     <div className="min-h-screen bg-[#f6fbff] font-sans">
       <MainHeader />
 
-      {/* Título e subtítulo */}
       <section className="px-8 mt-2 mb-6 max-w-[1200px] mx-auto">
         <h1 className="text-4xl font-bold text-[#222] mb-2">
           Relatório de Gerenciamento de Incidentes
@@ -47,9 +52,7 @@ const Home: React.FC = () => {
         </p>
       </section>
 
-      {/* Mapa e SearchBar */}
       <section className="px-8 flex flex-col items-center mb-12 max-w-[1200px] mx-auto">
-        {/* Barra de busca fora do mapa */}
         <div className="w-full max-w-3xl mb-4 relative">
           <span className="absolute left-6 top-1/2 -translate-y-1/2 text-[#2196C9]">
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -73,7 +76,6 @@ const Home: React.FC = () => {
           ref={containerRef}
           className="relative w-full h-96 rounded-2xl flex items-start justify-center overflow-hidden bg-[#008A8F]"
         >
-          {/* Imagem do mapa */}
           <div
             className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden flex items-center justify-center"
             style={{ zIndex: 0 }}
@@ -104,7 +106,6 @@ const Home: React.FC = () => {
               }}
             />
           </div>
-          {/* Botões de zoom e localização */}
           <div className="absolute right-8 bottom-8 flex flex-col gap-2 z-10">
             <button
               onClick={handleZoomIn}
@@ -137,58 +138,54 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Incidentes Recentes - Cards */}
       <section className="px-8 mb-12 max-w-[1200px] mx-auto">
         <h2 className="text-2xl font-bold text-[#222] mb-4">
           Incidentes Recentes
         </h2>
-        <div className="flex gap-8 flex-wrap justify-between">
-          {/* Card 1 */}
-          <div className="bg-white rounded-xl shadow-md overflow-hidden w-80">
-            <img
-              src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
-              alt="Facility A"
-              className="w-full h-40 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="font-bold text-lg text-[#222]">Facility A</h3>
-              <p className="text-[#5B7F95] text-sm">
-                Ultimo incidente: 2 dias atrás
-              </p>
-            </div>
+        {isLoading ? (
+          <p className="text-[#5B7F95]">Carregando...</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {recentOccurrences.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white rounded-xl shadow-md overflow-hidden"
+              >
+                <img
+                  src={`https://source.unsplash.com/random/400x200?sig=${item.id}`}
+                  alt={item.location}
+                  className="w-full h-40 object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="font-bold text-lg text-[#222]">
+                    {item.location}
+                  </h3>
+                  <p className="text-[#5B7F95] text-sm">{item.city}</p>
+                  <p className="text-[#5B7F95] text-sm mt-1">
+                    Criado em:{" "}
+                    {new Date(item.createdAt).toLocaleDateString("pt-BR")}
+                  </p>
+
+                  <p
+                    className={`text-sm font-semibold mt-1 ${
+                      item.status && statusColorMap[item.status]
+                        ? statusColorMap[item.status]
+                        : "text-gray-600"
+                    }`}
+                  >
+                    Status:{" "}
+                    {item.status && statusMap[item.status]
+                      ? statusMap[item.status]
+                      : "Desconhecido"}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-          {/* Card 2 */}
-          <div className="bg-white rounded-xl shadow-md overflow-hidden w-80">
-            <img
-              src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80"
-              alt="Facility B"
-              className="w-full h-40 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="font-bold text-lg text-[#222]">Facility B</h3>
-              <p className="text-[#5B7F95] text-sm">
-                Ultimo incidente: 1 week ago
-              </p>
-            </div>
-          </div>
-          {/* Card 3 */}
-          <div className="bg-white rounded-xl shadow-md overflow-hidden w-80">
-            <img
-              src="https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=400&q=80"
-              alt="Facility C"
-              className="w-full h-40 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="font-bold text-lg text-[#222]">Facility C</h3>
-              <p className="text-[#5B7F95] text-sm">
-                Last incidente: 1 monoto ao
-              </p>
-            </div>
-          </div>
-        </div>
+        )}
       </section>
 
-      {/* Incidentes Recentes - Métricas */}
+      {/* Métricas mantidas (mockadas por enquanto) */}
       <section className="px-8 mb-12 max-w-[1200px] mx-auto">
         <h2 className="text-2xl font-bold text-[#222] mb-4">
           Incidentes Recentes

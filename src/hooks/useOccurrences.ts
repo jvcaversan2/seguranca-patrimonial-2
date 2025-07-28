@@ -25,5 +25,8 @@ export function useOccurrences() {
       return res.data;
     },
     enabled: !!accessToken && !!user,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 }

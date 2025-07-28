@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import MainHeader from "../../components/MainHeader";
-import { unidades, locaisUnidades, ocorrencias } from "../../data/data";
+import { ocorrencias } from "../../data/data";
 import { useCreateOccurrence } from "../../hooks/useCreateOccurrence";
+import { useUnidades } from "../../hooks/useUnidades";
+import { useSetores } from "../../hooks/useSetores";
 
 const gravidades = ["Leve", "Moderado", "Grave"];
 const classificacoes = ["Positiva", "Negativa"];
@@ -9,8 +11,8 @@ const statusList = ["Aberto", "Fechado", "Em andamento"];
 const moedas = ["BRL", "USD", "EUR"];
 
 const NovaOcorrencia: React.FC = () => {
-  const [unidade, setUnidade] = useState(unidades[0]);
-  const [setor, setSetor] = useState(locaisUnidades[0]);
+  const [unidade, setUnidade] = useState("");
+  const [setor, setSetor] = useState("");
   const [data, setData] = useState("2024-04-23");
   const [hora, setHora] = useState("15:30");
   const [categoria, setCategoria] = useState(ocorrencias[0]);
@@ -30,8 +32,13 @@ const NovaOcorrencia: React.FC = () => {
     }
   );
 
+  const { data: todasUnidades, isLoading } = useUnidades();
+  const { data: setores, isLoading: loadingSetores } = useSetores();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!unidade) return alert("Selecione uma unidade");
+
     const gravidadeCorrigida =
       gravidade === "Moderado" ? "Moderada" : gravidade;
     const isoDateTime = new Date(`${data}T${hora}:00`).toISOString();
@@ -41,7 +48,7 @@ const NovaOcorrencia: React.FC = () => {
         date: data,
         time: isoDateTime,
         attendedArea: setor,
-        location: unidade,
+        location: unidade, // ← Enviando o nome da unidade como location
         report: descricao,
         classification: classificacao as "Positiva" | "Negativa",
         severity: gravidadeCorrigida as "Leve" | "Moderada" | "Grave",
@@ -56,6 +63,8 @@ const NovaOcorrencia: React.FC = () => {
       console.error("Erro ao registrar ocorrência:", err);
     }
   };
+
+  console.log("todasUnidades:", todasUnidades);
 
   return (
     <div className="min-h-screen bg-[#f6f9fb] font-sans">
@@ -74,11 +83,16 @@ const NovaOcorrencia: React.FC = () => {
               onChange={(e) => setUnidade(e.target.value)}
               className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3"
             >
-              {unidades.map((u) => (
-                <option key={u} value={u}>
-                  {u}
-                </option>
-              ))}
+              <option value="">Selecione</option>
+              {isLoading ? (
+                <option>Carregando unidades...</option>
+              ) : (
+                (todasUnidades ?? []).map((u) => (
+                  <option key={u.id} value={u.name}>
+                    {u.name}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 
@@ -91,11 +105,16 @@ const NovaOcorrencia: React.FC = () => {
               onChange={(e) => setSetor(e.target.value)}
               className="w-full rounded-lg border border-[#e3e8ee] bg-white px-4 py-3"
             >
-              {locaisUnidades.map((l) => (
-                <option key={l} value={l}>
-                  {l}
-                </option>
-              ))}
+              <option value="">Selecione</option>
+              {loadingSetores ? (
+                <option>Carregando setores...</option>
+              ) : (
+                (setores ?? []).map((s) => (
+                  <option key={s.id} value={s.name}>
+                    {s.name}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 
