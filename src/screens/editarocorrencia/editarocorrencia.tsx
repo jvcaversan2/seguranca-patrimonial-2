@@ -89,7 +89,8 @@ const EditarOcorrencia: React.FC = () => {
             | "Aberto"
             | "Em_analise"
             | "Em_andamento"
-            | "Concluido",
+            | "Concluido"
+            | undefined,
           currency: moeda as "BRL" | "USD" | "EUR",
           eventCost: custoEvento ? parseFloat(custoEvento) : undefined,
           totalCost: custoTotal ? parseFloat(custoTotal) : undefined,

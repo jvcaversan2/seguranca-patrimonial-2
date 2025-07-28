@@ -1,4 +1,5 @@
 import React from "react";
+import { statusMap } from "../utils/statusUtils";
 
 type Option = { id: number; name: string };
 
@@ -79,7 +80,7 @@ export const OcorrenciaForm: React.FC<OcorrenciaFormProps> = ({
 }) => {
   const gravidades = ["Leve", "Moderado", "Grave"];
   const classificacoes = ["Positiva", "Negativa"];
-  const statusList = ["Aberto", "Fechado", "Em andamento"];
+  const statusList = Object.keys(statusMap);
   const moedas = ["BRL", "USD", "EUR"];
 
   return (
@@ -252,7 +253,7 @@ export const OcorrenciaForm: React.FC<OcorrenciaFormProps> = ({
         >
           {statusList.map((s) => (
             <option key={s} value={s}>
-              {s}
+              {statusMap[s] ?? s}
             </option>
           ))}
         </select>
@@ -305,6 +306,7 @@ export const OcorrenciaForm: React.FC<OcorrenciaFormProps> = ({
       <button
         type="submit"
         disabled={isPending}
+        title="Registrar Ocorrência"
         className="w-full py-3 bg-[#2196C9] hover:bg-[#176b8a] text-white font-bold rounded-lg text-lg mt-4 disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {isPending ? "Registrando..." : "Registrar Ocorrência"}
