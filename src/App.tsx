@@ -8,6 +8,7 @@ import NovaOcorrencia from "./screens/novaocorrencia/novaocorrencia";
 import DetalhesOcorrencias from "./screens/detalhesocorrencias/detalhesocorrencias";
 import PerfilConfiguracao from "./screens/perfilconfiguracao/perfilconfiguracao";
 import Relatorios from "./screens/relatorios/relatorios";
+import EditarOcorrencias from "./screens/editarocorrencia/editarocorrencia";
 import { PrivateRoute } from "./store/privateRoutes";
 
 function App() {
@@ -46,6 +47,14 @@ function App() {
           element={
             <PrivateRoute>
               <DetalhesOcorrencias />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/detalhesocorrencias/:id/editar"
+          element={
+            <PrivateRoute>
+              <EditarOcorrencias />
             </PrivateRoute>
           }
         />

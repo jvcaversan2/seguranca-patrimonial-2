@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import MainHeader from "../../components/MainHeader";
 import { useOccurrenceById } from "../../hooks/useOccorrencyById";
 import { statusMap } from "../../utils/statusUtils";
@@ -7,6 +7,8 @@ import { statusMap } from "../../utils/statusUtils";
 const DetalhesOcorrencias: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: occurrence, isLoading } = useOccurrenceById(id);
+
+  const navigate = useNavigate();
 
   if (isLoading || !occurrence) {
     return (
@@ -130,7 +132,12 @@ const DetalhesOcorrencias: React.FC = () => {
               Histórico da Ocorrência
             </span>
             <div className="flex gap-2">
-              <button className="px-4 py-1 rounded bg-[#e3e8ee] text-[#222] font-semibold">
+              <button
+                className="px-4 py-1 rounded bg-[#e3e8ee] text-[#222] font-semibold"
+                onClick={() =>
+                  navigate(`/detalhesocorrencias/${occurrence.id}/editar`)
+                }
+              >
                 Editar
               </button>
               <button className="px-4 py-1 rounded bg-[#2196C9] text-white font-semibold">
