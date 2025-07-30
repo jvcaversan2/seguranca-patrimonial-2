@@ -40,3 +40,10 @@ export const OccurrenceType = {
 } as const;
 
 export type OccurrenceType = keyof typeof OccurrenceType;
+
+export interface EmitenteFormData {
+  name: string;
+  registration: string;
+  unit: string;
+  ciu?: string;
+}

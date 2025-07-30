@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import MainHeader from "../../components/MainHeader";
 import { useOccurrences } from "../../hooks/useOccurrences";
+import { statusMap, statusColorMap } from "../../utils/statusUtils";
 
 const Ocorrencias: React.FC = () => {
   const navigate = useNavigate();
@@ -98,8 +99,16 @@ const Ocorrencias: React.FC = () => {
                     </td>
                     <td className="py-3 px-4">{o.date}</td>
                     <td className="py-3 px-4">
-                      <span className="px-4 py-1 rounded-full text-sm font-semibold bg-[#e3e8ee] text-[#222]">
-                        {o.status || "Indefinido"}
+                      <span
+                        className={`px-4 py-1 rounded-full text-sm font-semibold ${
+                          o.status && statusColorMap[o.status]
+                            ? statusColorMap[o.status]
+                            : "bg-[#e3e8ee] text-[#222]"
+                        }`}
+                      >
+                        {o.status && statusMap[o.status]
+                          ? statusMap[o.status]
+                          : "Indefinido"}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-[#222] text-opacity-80">

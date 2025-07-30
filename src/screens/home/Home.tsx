@@ -3,6 +3,7 @@ import MainHeader from "../../components/MainHeader";
 import GptMapImage from "../../assets/ChatGPT Image 21_07_2025, 13_40_14.png";
 import { useRecentOccurrences } from "../../hooks/useRecentsOccurrences";
 import { statusColorMap, statusMap } from "../../utils/statusUtils";
+import { Link } from "react-router-dom";
 
 const Home: React.FC = () => {
   const [zoom, setZoom] = useState(1);
@@ -147,9 +148,10 @@ const Home: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
             {recentOccurrences.map((item) => (
-              <div
+              <Link
+                to={`/detalhesocorrencias/${item.id}`}
                 key={item.id}
-                className="bg-white rounded-xl shadow-md overflow-hidden"
+                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-200"
               >
                 <img
                   src={`https://source.unsplash.com/random/400x200?sig=${item.id}`}
@@ -179,7 +181,7 @@ const Home: React.FC = () => {
                       : "Desconhecido"}
                   </p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

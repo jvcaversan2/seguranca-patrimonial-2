@@ -1,6 +1,6 @@
 export const statusMap: Record<string, string> = {
   Aberto: "Aberto",
-  Em_analise: "Em análise",
+  Em_analise: "Em Análise",
   Em_andamento: "Em Andamento",
   Concluido: "Concluído",
 };

@@ -95,7 +95,7 @@ const DetalhesOcorrencias: React.FC = () => {
             <div className="mb-4">{occurrence.report}</div>
 
             <div className="font-semibold text-lg text-[#222] mb-1">Status</div>
-            <div>{occurrence.status}</div>
+            <div>{statusMap[occurrence.status as keyof typeof statusMap]}</div>
           </div>
 
           <div>

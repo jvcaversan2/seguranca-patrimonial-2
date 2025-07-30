@@ -1,12 +1,22 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Group47 from "../assets/Group 47.svg";
+import { useAuthStore } from "@/store/auth";
+import { LogOut } from "lucide-react";
 
 interface MainHeaderProps {
   avatarUrl?: string;
 }
 
 const MainHeader: React.FC<MainHeaderProps> = ({ avatarUrl }) => {
+  const navigate = useNavigate();
+
+  const onClickLogout = () => {
+    const logout = useAuthStore.getState().logout;
+    logout();
+    navigate("/");
+  };
+
   return (
     <header className="flex items-center justify-between px-10 py-4 border-b border-[#e3e8ee] bg-white">
       <div className="flex items-center gap-2">
@@ -38,11 +48,20 @@ const MainHeader: React.FC<MainHeaderProps> = ({ avatarUrl }) => {
           </svg>
           Search
         </button>
-        <img
-          src={avatarUrl || "https://randomuser.me/api/portraits/men/32.jpg"}
-          alt="Avatar"
-          className="w-10 h-10 rounded-full object-cover border-2 border-[#e3e8ee]"
-        />
+        <Link to="/perfilconfiguracao">
+          <img
+            src={avatarUrl || "https://randomuser.me/api/portraits/men/32.jpg"}
+            alt="Avatar"
+            className="w-10 h-10 rounded-full object-cover border-2 border-[#e3e8ee]"
+          />
+        </Link>
+
+        <button
+          onClick={onClickLogout}
+          className="text-red-500 text-sm flex items-center hover:underline mt-2 ml-2"
+        >
+          <LogOut className="w-4 h-4 mr-1" />
+        </button>
       </div>
     </header>
   );
