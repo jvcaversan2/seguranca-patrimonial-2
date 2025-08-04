@@ -21,7 +21,7 @@ const DetalhesOcorrencias: React.FC = () => {
     );
   }
 
-  const etapas = ["Aberto", "Em análise", "Em Andamento", "Concluído"];
+  const etapas = ["Aberto", "Em Análise", "Em Andamento", "Concluído"];
   const statusFormatado =
     statusMap[occurrence.status as keyof typeof statusMap];
   const statusAtualIndex = etapas.findIndex(

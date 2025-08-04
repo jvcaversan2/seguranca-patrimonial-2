@@ -12,6 +12,8 @@ import {
   Check,
 } from "lucide-react";
 import MainHeader from "../../components/MainHeader";
+import { useUploadPhoto } from "@/hooks/useUploadPhoto";
+import { api } from "@/api/axios";
 
 export default function PerfilConfiguracao() {
   const { user } = useAuthStore();
@@ -27,6 +29,8 @@ export default function PerfilConfiguracao() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (data) {
@@ -66,6 +70,38 @@ export default function PerfilConfiguracao() {
     setHasChanges(false);
   };
 
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const uploadPhoto = useUploadPhoto();
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // preview instantâneo (opcional)
+    const previewUrl = URL.createObjectURL(file);
+    setPhotoUrl(previewUrl);
+
+    uploadPhoto.mutate(file, {
+      onSuccess: (data) => {
+        if (data.photo) {
+          const newUrl = `${api.defaults.baseURL}/uploads/photos/${
+            data.photo
+          }?t=${Date.now()}`;
+          const img = new Image();
+          img.onload = () => {
+            setPhotoUrl(newUrl); // só atualiza a imagem visível depois que ela de fato carregar
+          };
+          img.src = newUrl;
+        }
+      },
+      onError: () => {
+        alert("Erro ao enviar a foto.");
+      },
+    });
+  };
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FAFDFF] font-sans flex items-center justify-center">
@@ -83,13 +119,41 @@ export default function PerfilConfiguracao() {
         <div className="bg-white rounded-xl shadow-md p-6 flex flex-col md:flex-row items-center md:items-start md:justify-between">
           <div className="flex items-center space-x-4 w-full">
             {/* Avatar */}
-            <div className="relative">
-              <div className="w-24 h-24 rounded-lg bg-gray-200 flex items-center justify-center">
-                <User className="w-12 h-12 text-gray-500" />
-              </div>
+            <div
+              className="relative cursor-pointer group"
+              onClick={handlePhotoClick}
+            >
+              {uploadPhoto.isPending && (
+                <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded-lg z-10">
+                  <div className="w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+              {photoUrl || data?.photo ? (
+                <img
+                  src={
+                    photoUrl ||
+                    `${api.defaults.baseURL}/uploads/photos/${data?.photo}`
+                  }
+                  alt="Foto de perfil"
+                  className="w-24 h-24 rounded-lg object-cover border border-gray-300"
+                />
+              ) : (
+                <div className="w-24 h-24 rounded-lg bg-gray-200 flex items-center justify-center">
+                  <User className="w-12 h-12 text-gray-500" />
+                </div>
+              )}
+
               <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-white flex items-center justify-center shadow">
                 <Check className="w-4 h-4 text-white" />
               </div>
+
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handlePhotoChange}
+              />
             </div>
 
             {/* Info */}
